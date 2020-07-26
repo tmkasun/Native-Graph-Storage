@@ -1,0 +1,4 @@
+/mnt/wd_ubuntu_data_mnt/research/graph_store/build/CMakeFiles/rebuild_cache.dir
+/mnt/wd_ubuntu_data_mnt/research/graph_store/build/CMakeFiles/edit_cache.dir
+/mnt/wd_ubuntu_data_mnt/research/graph_store/build/CMakeFiles/cppTest.dir
+/mnt/wd_ubuntu_data_mnt/research/graph_store/build/CMakeFiles/graphStoreTest.dir

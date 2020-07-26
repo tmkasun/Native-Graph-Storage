@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeBlock.cpp
+NodeBlock.h
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeBlock.h
+iostream
+-
+sstream
+-
+vector
+-
+
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeBlock.h
+cstring
+-
+fstream
+-
+set
+-
+string
+-
+
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeManager.cpp
+string
+-
+NodeManager.h
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeManager.h
+NodeBlock.h
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeBlock.h
+
+/mnt/wd_ubuntu_data_mnt/research/graph_store/lib/NodeManager.h
+fstream
+-
+iostream
+-
+string
+-
+unordered_map
+-
+

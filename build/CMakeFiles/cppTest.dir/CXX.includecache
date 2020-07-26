@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/wd_ubuntu_data_mnt/research/graph_store/cppTesting.cpp
+fstream
+-
+iostream
+-
+cstring
+-
+

@@ -1,0 +1,1 @@
+/usr/bin/g++  -g   CMakeFiles/graphStoreTest.dir/store.cpp.o CMakeFiles/graphStoreTest.dir/lib/JasmineGraphIncrementalStore.cpp.o CMakeFiles/graphStoreTest.dir/lib/NodeBlock.cpp.o CMakeFiles/graphStoreTest.dir/lib/NodeManager.cpp.o  -o graphStoreTest 
