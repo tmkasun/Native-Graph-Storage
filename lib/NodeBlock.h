@@ -9,34 +9,42 @@
 class NodeBlock {
    private:
     unsigned int addr;
-    std::string id;               // Node ID for this block
-    static const int BLOCK_SIZE;  // Size of a node block in bytes
+    std::string id;  // Node ID for this block
 
    public:
     char usage;
-    char label[6];
+    char label[6] = {0}; // Initialize with null chars
     unsigned int edgeRef;
     unsigned int propRef;
+
+    static const unsigned long BLOCK_SIZE;  // Size of a node block in bytes
 
     NodeBlock(std::string id, unsigned int index) {
         this->id = id;
         this->addr = index * BLOCK_SIZE;
         this->usage = true;
-        if (sizeof(id) <= sizeof(label)) {
+        if (id.length() <= sizeof(label)) {
             std::strcpy(this->label, id.c_str());
         }
-        this->edgeRef = 0;
-        this->propRef = 0;
+        this->edgeRef = 50505050;
+        this->propRef = 20202020;
     };
 
-    void save(std::fstream* cursor);
+    NodeBlock(unsigned int index, unsigned int edgeRef, unsigned int propRef, char label[], bool usage) {
+        this->id = id;
+        this->addr = index * BLOCK_SIZE;
+        this->usage = usage;
+        this->edgeRef = edgeRef;
+        this->propRef = propRef;
+        strcpy(this->label, label);
+    };
+
+    void save(std::fstream *cursor);
+    std::string getLabel();
     bool isInUse();
     std::set<int> getEdges();
     std::set<int> getProps();
     int getFlags();
-
-    static NodeBlock get(int nodeID);
-
 };
 
 #endif
