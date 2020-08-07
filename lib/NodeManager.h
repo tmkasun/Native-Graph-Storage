@@ -12,6 +12,9 @@ class NodeManager {
     unsigned int nextNodeIndex = 0;
     std::fstream *nodeDBT;
     int dbSize(std::string path);
+    void persistNodeIndex();
+    std::unordered_map<std::string, unsigned int> readNodeIndex();
+    static const unsigned long INDEX_KEY_SIZE;  // Size of a index key entry in bytes
 
    public:
     std::string index_db_loc = "streamStore/nodes.index.db";
@@ -21,12 +24,11 @@ class NodeManager {
 
     NodeManager(std::string);
     ~NodeManager() {
-        this->nodeDBT->flush();
-        this->nodeDBT->close();
         delete this->nodeDBT;
     };
 
     void addEdge(std::pair<int, int>);
+    void close();
     unsigned int addNode(std::string); // will redurn DB block address
     NodeBlock get(unsigned int nodeID);
 

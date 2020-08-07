@@ -2,28 +2,48 @@
 
 #include <sys/stat.h>
 
-
-NodeManager::NodeManager(std::string mode){
-    if(mode == "app") {
-        this->nodeDBT = new std::fstream("streamStore/nodes.db", std::ios::in | std::ios::out | std::ios::app | std::ios::binary);
-    } else if (mode == "trunc")
-    {
-        this->nodeDBT = new std::fstream("streamStore/nodes.db", std::ios::in | std::ios::out | std::ios::trunc | std::ios::binary);
-        
+NodeManager::NodeManager(std::string mode) {
+    std::ios_base::openmode openMode = std::ios::trunc;  // default is Trunc mode which overrides the entire file
+    if (mode == "app") {
+        openMode = std::ios::app;  // if app, open in append mode
     }
- std::ifstream index_db(index_db_loc);
-    if (index_db.is_open()) {
-        std::string data;
-        while (getline(index_db, data)) {
-            std::cout << data << '\n';
-            // Read and populate nodeIndex map
-        }
-        index_db.close();
-    }
+    this->nodeDBT = new std::fstream(this->nodes_db_loc, std::ios::in | std::ios::out | openMode | std::ios::binary);
+    this->nodeIndex = readNodeIndex();
     if (dbSize(nodes_db_loc) % NodeBlock::BLOCK_SIZE != 0) {
         std::cout << "WARNING: " << nodes_db_loc << " might be corrupted!" << std::endl;
-    }   
+    }
+}
 
+std::unordered_map<std::string, unsigned int> NodeManager::readNodeIndex() {
+    std::ifstream index_db(this->index_db_loc);
+    std::cout << "DEBUG: tellg " << index_db.tellg() << std::endl;
+    std::unordered_map<std::string, unsigned int> _nodeIndex;  // temproy node index data holder
+
+    if (index_db.is_open()) {
+        int iSize = dbSize(this->index_db_loc);
+        unsigned long dataWidth = NodeManager::INDEX_KEY_SIZE + sizeof(unsigned int);
+        if (iSize % dataWidth != 0) {
+            std::cout << "ERROR: " << this->index_db_loc << " is corrupted!" << std::endl;
+            throw std::runtime_error("DB file is corrupted!");
+        }
+
+        char nodeIDC[NodeManager::INDEX_KEY_SIZE];
+        unsigned int nodeIndexId;
+        for (size_t i = 0; i < iSize / dataWidth; i++) {
+            std::cout << "DEBUG: tellg at index " << i << " ---> " << index_db.tellg() << std::endl;
+
+            nodeIDC[NodeManager::INDEX_KEY_SIZE] = {0};  // Fill with null chars before puting data
+            if (!index_db.read(&nodeIDC[0], NodeManager::INDEX_KEY_SIZE)) {
+                std::cout << "ERROR: Error while reading index data from block " << i << std::endl;
+            }
+            if (!index_db.read(reinterpret_cast<char *>(&nodeIndexId), sizeof(unsigned int))) {
+                std::cout << "ERROR: Error while reading index data from block " << i << std::endl;
+            }
+            _nodeIndex[std::string(nodeIDC)] = nodeIndexId;
+        }
+    }
+    index_db.close();
+    return _nodeIndex;
 }
 
 unsigned int NodeManager::addNode(std::string nodeId) {
@@ -84,7 +104,7 @@ int NodeManager::dbSize(std::string path) {
 NodeBlock NodeManager::get(unsigned int nodeID) {
     const unsigned int blockAddress = nodeID * NodeBlock::BLOCK_SIZE;
     this->nodeDBT->seekg(blockAddress);
-    unsigned int edgeRef;  // = new char [NodeBlock::BLOCK_SIZE];
+    unsigned int edgeRef;
     unsigned int propRef;
     char usageBlock;
     char label[6];
@@ -109,3 +129,28 @@ NodeBlock NodeManager::get(unsigned int nodeID) {
     std::cout << "Length of label = " << strlen(label) << std::endl;
     return NodeBlock(nodeID, edgeRef, propRef, label, usage);
 }
+
+void NodeManager::persistNodeIndex() {
+    std::ofstream index_db(this->index_db_loc, std::ios::trunc | std::ios::binary);
+    if (index_db.is_open()) {
+        for (auto nodeMap : this->nodeIndex) {
+            char nodeIDC[NodeManager::INDEX_KEY_SIZE] = {0};  // Initialize with null chars
+            std::strcpy(nodeIDC, nodeMap.first.c_str());
+            index_db.write(nodeIDC, sizeof(nodeIDC));
+            unsigned int nodeBlockIndex = nodeMap.second;
+            index_db.write(reinterpret_cast<char *>(&(nodeBlockIndex)), sizeof(unsigned int));
+
+            std::cout << "DEBUG: writing node index --> Node key " << nodeIDC << " value " << nodeBlockIndex
+                      << std::endl;
+        }
+    }
+    index_db.close();
+}
+
+void NodeManager::close() {
+    this->persistNodeIndex();
+    this->nodeDBT->flush();
+    this->nodeDBT->close();
+}
+
+const unsigned long NodeManager::INDEX_KEY_SIZE = 8;
