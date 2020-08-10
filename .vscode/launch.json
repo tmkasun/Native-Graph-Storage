@@ -19,7 +19,7 @@
                 },
             ],
             "externalConsole": false,
-            "MIMode": "gdb",
+            "MIMode": "lldb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -27,8 +27,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "miDebuggerPath": "/usr/bin/gdb",
-        },{
+        },
+        {
             "name": "CPP Debug",
             "type": "cppdbg",
             "request": "launch",
@@ -54,6 +54,37 @@
                 }
             ],
             "miDebuggerPath": "/usr/bin/gdb"
-        }
+        },
+        {
+            "name": "onlyDebug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/graphStoreTest",
+            "targetArchitecture": "x86_64",
+            "args": [
+                "native",
+                "1",
+                "localhost",
+                "1",
+                "localhost"
+            ],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "JASMINEGRAPH_HOME",
+                    "value": "/mnt/wd_ubuntu_data_mnt/research/jasminegraph"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": false
+                }
+            ],
+        },
     ]
 }

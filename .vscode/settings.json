@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.md": "markdown",
         "iosfwd": "cpp",
         "memory": "cpp",
         "utility": "cpp",
@@ -72,6 +73,10 @@
         "ios": "cpp",
         "locale": "cpp",
         "queue": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "__errc": "cpp",
+        "__node_handle": "cpp",
+        "complex": "cpp",
+        "stack": "cpp"
     }
 }
