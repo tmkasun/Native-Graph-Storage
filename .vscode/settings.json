@@ -77,6 +77,13 @@
         "__errc": "cpp",
         "__node_handle": "cpp",
         "complex": "cpp",
-        "stack": "cpp"
-    }
+        "stack": "cpp",
+        "__memory": "cpp"
+    },
+    "workbench.editorAssociations": [
+        {
+            "viewType": "hexEditor.hexedit",
+            "filenamePattern": "*.db"
+        },
+    ]
 }
