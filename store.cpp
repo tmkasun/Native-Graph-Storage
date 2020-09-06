@@ -44,14 +44,14 @@ int main(int argc, const char** argv) {
 
     ifstream coraFeatures("graph_data/cora/cora.content");
     string nodeProps;
-    for (size_t i = 0; i < 100; i++) {
+    for (size_t i = 0; i < 500; i++) {
         getline(coraFeatures, nodeProps);
         cout << nodeProps << endl;
         std::vector<std::string> v = JasmineGraphIncrementalStore::_split(nodeProps, '\t');
         string nodeLabel = v[0];
         string nodeClassification = v[v.size() - 1];
 
-        unsigned char features[180] = {0};
+        char features[180] = {0};
         vector<string>::iterator it;  // declare an iterator to a vector of strings
         int count = 0;
         for (it = v.begin() + 1; it != v.end() - 1; ++it) {
@@ -64,10 +64,14 @@ int main(int argc, const char** argv) {
         cout << count << endl;
         NodeBlock* nodeBlock = nm.get(nodeLabel);
         if (nodeBlock) {
-            nodeBlock->addProperty("features", features);
+            nodeBlock->addProperty("features", &features[0]);
         }
     }
     coraFeatures.close();
+    NodeBlock* nodeBlock = nm.get("1106112");
+    do {
+        PropertyLink *current = nodeBlock->properties.next();
+    } while (nodeBlock->properties.next());
 
     nm.close();
     return 0;

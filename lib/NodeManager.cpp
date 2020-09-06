@@ -15,6 +15,7 @@ NodeManager::NodeManager(std::string mode) {
         new std::fstream(NodeManager::NODE_DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
     PropertyLink::propertiesDB =
         new std::fstream(PropertyLink::DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
+    // TODO: set PropertyLink nextPropertyIndex after validating by modulus check from file number of bytes
 
     if (dbSize(NodeManager::NODE_DB_PATH) % NodeBlock::BLOCK_SIZE != 0) {
         std::cout << "WARNING: " << NodeManager::NODE_DB_PATH << " might be corrupted!" << std::endl;
@@ -140,7 +141,7 @@ NodeBlock *NodeManager::get(std::string nodeId) {
     bool usage = usageBlock == '\1';
     std::cout << "Label = " << label << std::endl;
     std::cout << "Length of label = " << strlen(label) << std::endl;
-    nodeBlockPointer = new NodeBlock(blockAddress, edgeRef, propRef, label, usage);
+    nodeBlockPointer = new NodeBlock(nodeId, blockAddress, edgeRef, propRef, label, usage);
     return nodeBlockPointer;
 }
 
