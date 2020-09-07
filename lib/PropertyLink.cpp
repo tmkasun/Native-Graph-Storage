@@ -6,6 +6,7 @@
 
 PropertyLink::PropertyLink(unsigned int propertyBlockAddress) : blockAddress(propertyBlockAddress) {
     if (propertyBlockAddress > 0) {
+        bool brk = propertyBlockAddress == 51940;
         this->propertiesDB->seekg(propertyBlockAddress);
         char rawName[PropertyLink::MAX_NAME_SIZE] = {0};
         char rawValue[PropertyLink::MAX_VALUE_SIZE] = {0};
@@ -91,6 +92,7 @@ unsigned int PropertyLink::insert(std::string name, char* value) {
         std::cout << "Next prop index = " << PropertyLink::nextPropertyIndex << std::endl;
 
         unsigned int newAddress = PropertyLink::nextPropertyIndex * PropertyLink::PROPERTY_BLOCK_SIZE;
+        bool brk = newAddress == 51940;
         this->propertiesDB->seekp(newAddress);
         this->propertiesDB->write(dataName, PropertyLink::MAX_NAME_SIZE);
         this->propertiesDB->write(reinterpret_cast<char*>(dataValue), PropertyLink::MAX_VALUE_SIZE);
@@ -104,13 +106,14 @@ unsigned int PropertyLink::insert(std::string name, char* value) {
         this->nextPropAddress = newAddress;
         this->propertiesDB->seekp(this->blockAddress + PropertyLink::MAX_NAME_SIZE +
                                   PropertyLink::MAX_VALUE_SIZE);  // seek to current property next address
-        if (!this->propertiesDB->write(reinterpret_cast<char*>(&nextAddress), sizeof(nextAddress))) {
+        if (!this->propertiesDB->write(reinterpret_cast<char*>(&newAddress), sizeof(newAddress))) {
             std::cout << "ERROR: Error while updating property next address" << name << " into block address "
                       << this->blockAddress << std::endl;
             return -1;
         }
 
         PropertyLink::nextPropertyIndex++;  // Increment the shared property index value
+        return newAddress;
     }
 }
 
@@ -122,6 +125,10 @@ PropertyLink* PropertyLink::next() {
         return new PropertyLink(this->nextPropAddress);
     }
     return NULL;
+}
+
+bool PropertyLink::isEmpty(){
+    return !(this->blockAddress);
 }
 
 const unsigned long PropertyLink::MAX_NAME_SIZE = 12;

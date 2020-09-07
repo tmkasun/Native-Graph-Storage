@@ -69,9 +69,12 @@ int main(int argc, const char** argv) {
     }
     coraFeatures.close();
     NodeBlock* nodeBlock = nm.get("1106112");
+    PropertyLink *current = &(nodeBlock->properties);
+
     do {
-        PropertyLink *current = nodeBlock->properties.next();
-    } while (nodeBlock->properties.next());
+        cout << "Name = " << current->name << " value = " << current->value << endl;
+        current = current->next();
+    } while (current);
 
     nm.close();
     return 0;

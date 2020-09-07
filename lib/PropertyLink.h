@@ -24,6 +24,7 @@ class PropertyLink {
 
     PropertyLink(unsigned int);
     PropertyLink();
+    bool isEmpty();
     
     unsigned int insert(std::string, char[]);
     PropertyLink* next();
