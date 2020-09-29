@@ -30,8 +30,9 @@ class NodeManager {
     };
 
     void addEdge(std::pair<int, int>);
+    unsigned int addRelation(unsigned int, unsigned int);
     void close();
-    unsigned int addNode(std::string); // will redurn DB block address
+    NodeBlock addNode(std::string); // will redurn DB block address
     NodeBlock* get(std::string);
 
 };

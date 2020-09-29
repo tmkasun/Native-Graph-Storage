@@ -13,13 +13,6 @@ const string EDGE_DB = "streamStore/edges.db";
 int main(int argc, const char** argv) {
     cout << "Sample store" << endl;
 
-    // string name = "kasun";
-    // char *sample = "thennakoon";
-    // unsigned char fk  = 'a';
-    // // *sample[1] = 'a';
-    // sample = "wolas";
-    // cout << sample << endl;
-
     // // std::pair<string, unsigned *char> test = {name, &fk};
     // return -1;
     NodeManager nm = NodeManager("trunc");

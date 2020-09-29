@@ -4,6 +4,7 @@
 
 #include "NodeBlock.h"  // To setup node DB
 #include "PropertyLink.h"
+#include "RelationBlock.h"
 
 NodeManager::NodeManager(std::string mode) {
     std::ios_base::openmode openMode = std::ios::trunc;  // default is Trunc mode which overrides the entire file
@@ -14,6 +15,8 @@ NodeManager::NodeManager(std::string mode) {
     NodeBlock::nodesDB =
         new std::fstream(NodeManager::NODE_DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
     PropertyLink::propertiesDB =
+        new std::fstream(PropertyLink::DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
+    RelationBlock::relationsDB =
         new std::fstream(PropertyLink::DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
     // TODO: set PropertyLink nextPropertyIndex after validating by modulus check from file number of bytes
 
@@ -54,7 +57,9 @@ std::unordered_map<std::string, unsigned int> NodeManager::readNodeIndex() {
     return _nodeIndex;
 }
 
-unsigned int NodeManager::addNode(std::string nodeId) {
+unsigned int NodeManager::addRelation(unsigned int, unsigned int) { return 123; }
+
+NodeBlock NodeManager::addNode(std::string nodeId) {
     unsigned int assignedNodeIndex;
     if (this->nodeIndex.find(nodeId) == this->nodeIndex.end()) {
         std::cout << "DEBUG: nodeId not found in index " << nodeId << std::endl;
@@ -63,11 +68,12 @@ unsigned int NodeManager::addNode(std::string nodeId) {
         assignedNodeIndex = this->nextNodeIndex;
         this->nextNodeIndex++;
         sourceBlk.save();
+        return sourceBlk;
     } else {
         assignedNodeIndex = this->nodeIndex.at(nodeId);
+        return this->get(assignedNodeIndex);
         std::cout << "DEBUG: Found nodeIndex for nodeId " << nodeId << " at " << assignedNodeIndex << std::endl;
     }
-    return assignedNodeIndex * NodeBlock::BLOCK_SIZE;
 }
 
 void NodeManager::addEdge(std::pair<int, int> edge) {
@@ -75,6 +81,7 @@ void NodeManager::addEdge(std::pair<int, int> edge) {
     std::string destinationId = std::to_string(edge.second);
     unsigned int sourceNodeAddr = this->addNode(sourceId);
     unsigned int destNodeAddr = this->addNode(destinationId);
+    unsigned int relationAddr = this->addRelation(sourceNodeAddr, destNodeAddr);
     std::cout << "DEBUG: Source DB block address " << sourceNodeAddr << " Destination DB block address " << destNodeAddr
               << std::endl;
 }
