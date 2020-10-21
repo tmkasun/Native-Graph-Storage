@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 
+#include "RelationBlock.h"
+
 bool NodeBlock::isInUse() { return this->usage == '\1'; }
 
 std::string NodeBlock::getLabel() { return std::string(this->label); }
@@ -11,8 +13,6 @@ std::string NodeBlock::getLabel() { return std::string(this->label); }
 void NodeBlock::save() {
     char _label[PropertyLink::MAX_VALUE_SIZE] = {0};
     std::strcpy(_label, id.c_str());
-
-    bool brk = this->id == "1106112";
 
     bool isSmallLabel = id.length() <= sizeof(label);
     if (isSmallLabel) {
@@ -30,13 +30,50 @@ void NodeBlock::save() {
 }
 
 void NodeBlock::addProperty(std::string name, char* value) {
-    bool brk = this->id == "1106112";
     bool isEmpty = this->properties.isEmpty();
     this->propRef = properties.insert(name, value);
-    if (isEmpty) {  // If it was an empty prop link before inserting, Then update the property reference of this node block
+    if (isEmpty) {  // If it was an empty prop link before inserting, Then update the property reference of this node
+                    // block
         NodeBlock::nodesDB->seekp(this->addr + 1 + sizeof(this->edgeRef));
         NodeBlock::nodesDB->write(reinterpret_cast<char*>(&(this->propRef)), sizeof(this->propRef));
         NodeBlock::nodesDB->flush();
+    }
+}
+
+bool NodeBlock::updateEdgeRef(unsigned int edgeReferenceAddress, bool relocateHead) {
+    if (this->edgeRef == 0) {
+        int edgeRefOffset = sizeof(this->usage);
+        NodeBlock::nodesDB->seekp(this->addr + edgeRefOffset);
+        if (!NodeBlock::nodesDB->write(reinterpret_cast<char*>(&(edgeReferenceAddress)), sizeof(unsigned int))) {
+            std::cout << "ERROR: Error while updating edge reference address of " << edgeReferenceAddress
+                      << " for node " << this->addr << std::endl;
+        }
+        NodeBlock::nodesDB->flush();  // Sync the file with in-memory stream
+        this->edgeRef = edgeReferenceAddress;
+    } else if (relocateHead)
+    {
+        std::cout << "Info: Relocating edge list header" << std::endl;
+    }
+     else {
+        RelationBlock* currentRelation = RelationBlock::get(this->edgeRef);
+        while (currentRelation != NULL) {
+            if (currentRelation->source.address == this->addr) {
+                if (currentRelation->source.nextRelationId == 0) {
+                    return currentRelation->updateSourceNextRelAddr(edgeReferenceAddress);
+                } else {
+                    currentRelation = RelationBlock::get(currentRelation->source.nextRelationId);
+                }
+            } else if (!this->isDirected && currentRelation->source.address == this->addr) {
+                if (currentRelation->source.nextRelationId == 0) {
+                    return currentRelation->updateDestinationNextRelAddr(edgeReferenceAddress);
+                } else {
+                    currentRelation = RelationBlock::get(currentRelation->source.nextRelationId);
+                }
+            } else {
+                std::cout << "WARNING: Invalid relation block!!" << std::endl;
+            }
+        }
+        return false;
     }
 }
 

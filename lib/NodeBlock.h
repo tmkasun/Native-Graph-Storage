@@ -11,9 +11,10 @@
 
 class NodeBlock {
    private:
-    unsigned int addr;
+    bool isDirected = false;
 
    public:
+    unsigned int addr;
     std::string id;  // Node ID for this block ie: citation paper ID, Facebook accout ID, Twitter account ID etc
     char usage;      // Wheather this block is in use or not
     char label[6] = {
@@ -43,7 +44,7 @@ class NodeBlock {
         : id(id), addr(address), usage(usage), edgeRef(edgeRef), properties(propRef), propRef(propRef) {
         strcpy(this->label, label);
     };
-
+    bool updateEdgeRef(unsigned int, bool relocateHead=false);
     void save();
     std::string getLabel();
     bool isInUse();

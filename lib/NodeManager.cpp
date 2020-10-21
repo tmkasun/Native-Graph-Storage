@@ -17,7 +17,7 @@ NodeManager::NodeManager(std::string mode) {
     PropertyLink::propertiesDB =
         new std::fstream(PropertyLink::DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
     RelationBlock::relationsDB =
-        new std::fstream(PropertyLink::DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
+        new std::fstream(RelationBlock::DB_PATH, std::ios::in | std::ios::out | openMode | std::ios::binary);
     // TODO: set PropertyLink nextPropertyIndex after validating by modulus check from file number of bytes
 
     if (dbSize(NodeManager::NODE_DB_PATH) % NodeBlock::BLOCK_SIZE != 0) {
@@ -57,32 +57,49 @@ std::unordered_map<std::string, unsigned int> NodeManager::readNodeIndex() {
     return _nodeIndex;
 }
 
-unsigned int NodeManager::addRelation(unsigned int, unsigned int) { return 123; }
+unsigned int NodeManager::addRelation(NodeBlock source, NodeBlock destination) {
+    RelationBlock *newRelation = NULL;
+    if (source.edgeRef == 0 || destination.edgeRef == 0) {  // certainly a new relation block needed
+        newRelation = RelationBlock::add(source, destination);
+        if (newRelation) {
+            unsigned int relationBlockAddress = newRelation->addr;
+            source.updateEdgeRef(relationBlockAddress);
+            destination.updateEdgeRef(relationBlockAddress);
+        } else
+        {
+            std::cout << "WARNING: Something went wrong while adding the new edge/relation !" << std::endl;
+        }
+        
+    } else {
+        // check if the relation already exist or not
+    }
 
-NodeBlock NodeManager::addNode(std::string nodeId) {
+    std::cout << "all done" << std::endl;
+}
+
+NodeBlock *NodeManager::addNode(std::string nodeId) {
     unsigned int assignedNodeIndex;
     if (this->nodeIndex.find(nodeId) == this->nodeIndex.end()) {
         std::cout << "DEBUG: nodeId not found in index " << nodeId << std::endl;
-        NodeBlock sourceBlk = NodeBlock(nodeId, this->nextNodeIndex * NodeBlock::BLOCK_SIZE);
+        NodeBlock *sourceBlk = new NodeBlock(nodeId, this->nextNodeIndex * NodeBlock::BLOCK_SIZE);
         this->nodeIndex.insert({nodeId, this->nextNodeIndex});
         assignedNodeIndex = this->nextNodeIndex;
         this->nextNodeIndex++;
-        sourceBlk.save();
+        sourceBlk->save();
         return sourceBlk;
     } else {
-        assignedNodeIndex = this->nodeIndex.at(nodeId);
-        return this->get(assignedNodeIndex);
         std::cout << "DEBUG: Found nodeIndex for nodeId " << nodeId << " at " << assignedNodeIndex << std::endl;
+        return this->get(nodeId);
     }
 }
 
 void NodeManager::addEdge(std::pair<int, int> edge) {
     std::string sourceId = std::to_string(edge.first);
     std::string destinationId = std::to_string(edge.second);
-    unsigned int sourceNodeAddr = this->addNode(sourceId);
-    unsigned int destNodeAddr = this->addNode(destinationId);
-    unsigned int relationAddr = this->addRelation(sourceNodeAddr, destNodeAddr);
-    std::cout << "DEBUG: Source DB block address " << sourceNodeAddr << " Destination DB block address " << destNodeAddr
+    NodeBlock *sourceNode = this->addNode(sourceId);
+    NodeBlock *destNode = this->addNode(destinationId);
+    unsigned int relationAddr = this->addRelation(*sourceNode, *destNode);
+    std::cout << "DEBUG: Source DB block address " << sourceNode << " Destination DB block address " << destNode
               << std::endl;
 }
 
