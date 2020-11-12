@@ -3,8 +3,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "lib/JasmineGraphIncrementalStore.h"
-#include "lib/NodeManager.h"
+#include "lib/internal/JasmineGraphIncrementalStore.h"
+#include "lib/internal/NodeManager.h"
 
 using namespace std;
 const string NODE_DB = "streamStore/nodes.db";
@@ -20,24 +20,24 @@ int main(int argc, const char** argv) {
 
     ifstream sampleDataFile("graph_data/cora/cora.cites");
     string edge;
-    for (size_t i = 0; i < 500; i++) {
-        getline(sampleDataFile, edge);
-
+    long numberOfLines = 0;
+    while (getline(sampleDataFile, edge)) {
         std::vector<std::string> v = JasmineGraphIncrementalStore::_split(edge, '\t');
         std::cout << "Vertext 1 = " << stoi(v[0]) << std::endl;
         std::cout << "Vertext 2 = " << stoi(v[1]) << std::endl;
         std::pair<int, int> edgeP = {stoi(v[0]), stoi(v[1])};
         sampleStore.addEdge(edgeP);
-        std::cout << i << " edge  => " << edge << std::endl;
+        std::cout << numberOfLines << " edge  => " << edge << std::endl;
 
         nm.addEdge(edgeP);
+        numberOfLines++;
     }
-
+    std::cout << "Number of lines read = " << numberOfLines << std::endl;
     sampleDataFile.close();
 
     ifstream coraFeatures("graph_data/cora/cora.content");
     string nodeProps;
-    for (size_t i = 0; i < 500; i++) {
+    while (getline(coraFeatures, nodeProps)) {
         getline(coraFeatures, nodeProps);
         cout << nodeProps << endl;
         std::vector<std::string> v = JasmineGraphIncrementalStore::_split(nodeProps, '\t');
@@ -58,16 +58,20 @@ int main(int argc, const char** argv) {
         NodeBlock* nodeBlock = nm.get(nodeLabel);
         if (nodeBlock) {
             nodeBlock->addProperty("features", &features[0]);
+        } else {
+            std::cout << "Warning: Node not found in the DB!!" << std::endl;
         }
+
+        delete nodeBlock;
     }
     coraFeatures.close();
-    NodeBlock* nodeBlock = nm.get("1106112");
-    PropertyLink *current = &(nodeBlock->properties);
-
-    do {
-        cout << "Name = " << current->name << " value = " << current->value << endl;
-        current = current->next();
-    } while (current);
+    // NodeBlock* nodeBlock = nm.get("1106112");
+    // PropertyLink* current = &(nodeBlock->properties);
+    // delete nodeBlock;
+    // do {
+    //     cout << "Name = " << current->name << " value = " << current->value << endl;
+    //     current = current->next();
+    // } while (current);
 
     nm.close();
     return 0;

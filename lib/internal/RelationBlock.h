@@ -10,7 +10,7 @@
 #ifndef RELATION_BLOCK
 #define RELATION_BLOCK
 struct NodeRelation {
-    unsigned int address;
+    unsigned int address = 0;
     unsigned int nextRelationId = 0;
     unsigned int nextPid = 0;
     unsigned int preRelationId = 0;
@@ -19,11 +19,11 @@ struct NodeRelation {
 
 /**
  * Relation states
- *              Available       Not Available
- * Source           -               -
- * Source           x               -
- * Destination      -               x
- * Destination      x               x
+ *     Source       Destination
+ *       x               -
+ *       x               x
+ *       -               -
+ *       -               x
  *
  * **/
 
@@ -47,11 +47,19 @@ class RelationBlock {
     bool isInUse();
     int getFlags();
 
+    
+    bool setNextSource(unsigned int);
+    bool setNextDestination(unsigned int);
+    bool setPreviousSource(unsigned int);
+    bool setPreviousDestination(unsigned int);
+    
+    RelationBlock *nextSource();
+    RelationBlock *previousSource();
+    RelationBlock *nextDestination();
+    RelationBlock *previousDestination();
+
     static RelationBlock *add(NodeBlock, NodeBlock);
     static RelationBlock *get(unsigned int);
-    bool updateSourceNextRelAddr(unsigned int);
-    bool updateDestinationNextRelAddr(unsigned int);
-    
     static unsigned int nextRelationIndex;
     static const unsigned long BLOCK_SIZE;  // Size of a relation record block in bytes
     static std::string DB_PATH;

@@ -3,6 +3,8 @@
 streamStore/*.db
 
 build/
+lib/external/
+logs/
 
 # Compiled Object files
 *.slo

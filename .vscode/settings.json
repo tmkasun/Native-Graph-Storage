@@ -78,7 +78,13 @@
         "__node_handle": "cpp",
         "complex": "cpp",
         "stack": "cpp",
-        "__memory": "cpp"
+        "__memory": "cpp",
+        "__functional_03": "cpp",
+        "list": "cpp",
+        "codecvt": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp",
+        "variant": "cpp"
     },
     "workbench.editorAssociations": [
         {
