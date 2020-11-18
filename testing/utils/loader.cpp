@@ -24,7 +24,7 @@ class Loader {
             std::vector<std::string> v = JasmineGraphIncrementalStore::_split(edge, '\t');
             spdlog::debug("Vertext 1 = {}", stoi(v[0]));
             spdlog::debug("Vertext 2 = {}", stoi(v[1]));
-            std::pair<int, int> edgeP = {stoi(v[0]), stoi(v[1])};
+            std::pair<std::string, std::string> edgeP = {v[0], v[1]};
             spdlog::debug("{} edge => {}", numberOfLines, edge);
 
             nm->addEdge(edgeP);

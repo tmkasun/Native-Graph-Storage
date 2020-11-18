@@ -29,11 +29,12 @@ class NodeManager {
         delete NodeBlock::nodesDB;
     };
 
-    void addEdge(std::pair<int, int>);
+    std::pair<NodeBlock, NodeBlock> addEdge(std::pair<std::string, std::string>);
     unsigned int addRelation(NodeBlock, NodeBlock);
     void close();
     NodeBlock* addNode(std::string); // will redurn DB block address
     NodeBlock* get(std::string);
+    std::list<NodeBlock> getGraph(int limit = 10);
 
 };
 

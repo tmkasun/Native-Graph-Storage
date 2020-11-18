@@ -270,10 +270,10 @@ bool RelationBlock::setPreviousDestination(unsigned int newAddress) {
 }
 
 /**
- * Update relation record block given the offset to the recored from the begining, i:e 
- *  recordOffset 0 --> Source address 
- *  recordOffset 1 --> Source address 
- *  recordOffset 2 --> Source's next relation block address 
+ * Update relation record block given the offset to the recored from the begining, i:e
+ *  recordOffset 0 --> Source address
+ *  recordOffset 1 --> Source address
+ *  recordOffset 2 --> Source's next relation block address
  *  recordOffset 3 --> Source's next relation block partition id
  *                          .
  *                          .
@@ -294,6 +294,37 @@ bool RelationBlock::updateRelationRecords(int recordOffset, unsigned int data) {
 
 bool RelationBlock::isInUse() { return this->usage == '\1'; }
 unsigned int RelationBlock::nextRelationIndex = 1;  // Starting with 1 because of the 0 and '\0' differentiation issue
+
+void RelationBlock::addProperty(std::string name, char* value) {
+    if (this->propertyAddress == 0) {
+        PropertyLink* newLink = PropertyLink::create(name, value);
+        if (newLink) {
+            this->propertyAddress = newLink->blockAddress;
+            // If it was an empty prop link before inserting, Then update the property reference of this node
+            // block
+            this->updateRelationRecords(10, this->propertyAddress);
+        } else {
+            throw "Error occurred while adding a new property link to " + std::to_string(this->addr) + " node block";
+        }
+
+    } else {
+        this->propertyAddress = this->getPropertyHead()->insert(name, value);
+    }
+}
+PropertyLink* RelationBlock::getPropertyHead() { return PropertyLink::get(this->propertyAddress); }
+
+std::map<std::string, char*> RelationBlock::getAllProperties() {
+    std::map<std::string, char*> allProperties;
+    PropertyLink* current = this->getPropertyHead();
+    while (current) {
+        allProperties.insert({current->name, current->value});
+        PropertyLink* _temp = current->next();
+        delete current;  // To prevent memory leaks
+        current = _temp;
+    }
+    delete current;
+    return allProperties;
+}
 
 const unsigned long RelationBlock::BLOCK_SIZE = RelationBlock::RECORD_SIZE * 11;
 // One relation block holds 11 recods such as source addres, destination address, source next relation address ect . .

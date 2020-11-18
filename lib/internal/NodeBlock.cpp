@@ -196,7 +196,7 @@ std::list<NodeBlock> NodeBlock::getEdges() {
 
 std::map<std::string, char*> NodeBlock::getAllProperties() {
     std::map<std::string, char*> allProperties;
-    PropertyLink* current = PropertyLink::get(this->propRef);
+    PropertyLink* current = this->getPropertyHead();
     while (current) {
         allProperties.insert({current->name, current->value});
         PropertyLink* _temp = current->next();

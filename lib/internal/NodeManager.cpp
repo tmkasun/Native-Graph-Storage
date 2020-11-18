@@ -43,7 +43,7 @@ NodeManager::NodeManager(std::string mode) {
 }
 
 std::unordered_map<std::string, unsigned int> NodeManager::readNodeIndex() {
-    std::ifstream index_db(this->index_db_loc);
+    std::ifstream index_db(this->index_db_loc, std::ios::app | std::ios::binary);
     std::unordered_map<std::string, unsigned int> _nodeIndex;  // temproy node index data holder
 
     if (index_db.is_open()) {
@@ -67,7 +67,10 @@ std::unordered_map<std::string, unsigned int> NodeManager::readNodeIndex() {
             }
             _nodeIndex[std::string(nodeIDC)] = nodeIndexId;
         }
+    } else {
+        node_manager_logger.error("Error while opening the node index DB");
     }
+
     index_db.close();
     return _nodeIndex;
 }
@@ -108,17 +111,17 @@ NodeBlock *NodeManager::addNode(std::string nodeId) {
     }
 }
 
-void NodeManager::addEdge(std::pair<int, int> edge) {
-    std::string sourceId = std::to_string(edge.first);
-    std::string destinationId = std::to_string(edge.second);
-    NodeBlock *sourceNode = this->addNode(sourceId);
-    NodeBlock *destNode = this->addNode(destinationId);
+std::pair<NodeBlock, NodeBlock> NodeManager::addEdge(std::pair<std::string, std::string> edge) {
+    NodeBlock *sourceNode = this->addNode(edge.first);
+    NodeBlock *destNode = this->addNode(edge.second);
     unsigned int relationAddr = this->addRelation(*sourceNode, *destNode);
 
     node_manager_logger.debug("DEBUG: Source DB block address " + std::to_string(sourceNode->addr) +
                               " Destination DB block address " + std::to_string(destNode->addr));
-    delete sourceNode;
+    std::pair<NodeBlock, NodeBlock> returnVal = {*sourceNode, *destNode};
+    delete sourceNode; // to prevent memory leaks
     delete destNode;
+    return returnVal;
 }
 
 int NodeManager::dbSize(std::string path) {
@@ -213,6 +216,25 @@ void NodeManager::persistNodeIndex() {
         }
     }
     index_db.close();
+}
+
+/**
+ * Return the number of nodes upto the limit given in the arg from nodes index
+ * Default limit is 10
+ * */
+std::list<NodeBlock> NodeManager::getGraph(int limit) {
+    int i = 0;
+    std::list<NodeBlock> vertices;
+    for (auto it : this->nodeIndex) {
+        i++;
+        if (i >= limit) {
+            break;
+        }
+        auto nodeId = it.first;
+        NodeBlock *node = this->get(nodeId);
+        vertices.push_back(*node);
+    }
+    return vertices;
 }
 
 void NodeManager::close() {

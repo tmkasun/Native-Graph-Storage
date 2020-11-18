@@ -47,12 +47,11 @@ class RelationBlock {
     bool isInUse();
     int getFlags();
 
-    
     bool setNextSource(unsigned int);
     bool setNextDestination(unsigned int);
     bool setPreviousSource(unsigned int);
     bool setPreviousDestination(unsigned int);
-    
+
     RelationBlock *nextSource();
     RelationBlock *previousSource();
     RelationBlock *nextDestination();
@@ -60,6 +59,10 @@ class RelationBlock {
 
     static RelationBlock *add(NodeBlock, NodeBlock);
     static RelationBlock *get(unsigned int);
+    void addProperty(std::string, char *);
+    PropertyLink *getPropertyHead();
+    std::map<std::string, char*> getAllProperties();
+
     static unsigned int nextRelationIndex;
     static const unsigned long BLOCK_SIZE;  // Size of a relation record block in bytes
     static std::string DB_PATH;
