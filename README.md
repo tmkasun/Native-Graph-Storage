@@ -73,6 +73,8 @@ A `Relation Block` has following data structure in the disk.
 
 ## Nodes Index
 
+Node index is a lookup table for locating node id and it's relevent block index in the nodes DB
+
 
 Node index of the graph is stored in 
 ```
