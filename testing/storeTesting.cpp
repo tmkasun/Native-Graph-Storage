@@ -150,6 +150,9 @@ int main(int argc, const char** argv) {
 
     NodeBlock* nodeBlock = nm->get("35");
     std::list<NodeBlock> edges = nodeBlock->getEdges();
+    if (edges.size() != 168) {
+        throw "Number of edges expected for 35 is 168 but received " + std::to_string(edges.size());
+    }
     spdlog::debug("Number of edges = {}", edges.size());
     map<string, char*> allProperties = nodeBlock->getAllProperties();
     char* features35 = Loader::flagsToArray(allProperties["features"]);
@@ -269,7 +272,10 @@ int main(int argc, const char** argv) {
         "0	0	0	0	0	0	0	0	0	0	0	0	0	"
         "0	0	0	0	0	Genetic_Algorithms";
     NodeBlock* n1050679 = nm->get("1050679");
-    std::list<NodeBlock> e1050679 = nodeBlock->getEdges();
+    std::list<NodeBlock> e1050679 = n1050679->getEdges();
+    if (e1050679.size() != 4) {
+        throw "Number of edges expected for 1050679 is 4 but received " + std::to_string(e1050679.size());
+    }
     spdlog::debug("Number of edges 5064 = {}", e1050679.size());
 
     map<string, char*> p1050679 = n1050679->getAllProperties();
@@ -283,6 +289,9 @@ int main(int argc, const char** argv) {
 
     NodeBlock* n1114352 = nm->get("1114352");
     std::list<NodeBlock> e1114352 = n1114352->getEdges();
+    if (e1114352.size() != 4) {
+        throw "Number of edges expected for 1114352 is 4 but received " + std::to_string(e1114352.size());
+    }
     spdlog::debug("Number of edges 1114352 = {}", e1114352.size());
     for (auto nb : e1114352) {
         std::cout << "1114352\t" << nb.id << std::endl;
