@@ -1,6 +1,6 @@
 # Native Graph Database
 
-This is a native graph storage/database library implemented in C++. Main goal of this graph storage is to support streaming graph data and high performance graph operations. To cater the these requirement, We(JasmineGraph team) build this **native** streaming graph storage system.
+This is a native graph storage/database library implemented in C++. Main goal of this graph storage is to support streaming graph data and high performance graph operations. To cater the these requirement, We(JasmineGraph team) build this **native** streaming graph storage system. And with all we try to make the implementation simple as possible. 
 
 This repository contains only the C++ modules for graph storage system (core Graph store) and there is a Graph Storage system implemented using this core modules in [this repository](https://github.com/tmkasun/streaming_graph_partitioning)
 
