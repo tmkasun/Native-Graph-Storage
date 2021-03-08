@@ -84,7 +84,10 @@
         "codecvt": "cpp",
         "regex": "cpp",
         "shared_mutex": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "csignal": "cpp",
+        "forward_list": "cpp",
+        "valarray": "cpp"
     },
     "workbench.editorAssociations": [
         {

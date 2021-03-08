@@ -13,8 +13,12 @@ int main(int argc, const char** argv) {
     spdlog::set_level(spdlog::level::info);
 
     spdlog::info("Testing streaming store . . .");
-
-    NodeManager* nm = new NodeManager("trunc");
+    GraphConfig gc;
+    gc.graphID = 1;
+    gc.partitionID = 1;
+    gc.maxLabelSize = 10;
+    gc.openMode = "trunk";
+    NodeManager* nm = new NodeManager(gc);
 
     spdlog::info("Start loading cora cites graph data");
     auto t1 = std::chrono::high_resolution_clock::now();
